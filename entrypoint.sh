@@ -1,6 +1,7 @@
 #!/bin/bash
 set -e
 
+INPUT_WORKING_DIRECTORY="${INPUT_WORKING_DIRECTORY:-.}"
 INPUT_PATH="${INPUT_PATH:-.}"
 INPUT_DOCKERFILE="${INPUT_DOCKERFILE:-Dockerfile}"
 INPUT_TAGS="${INPUT_TAGS:-latest}"
@@ -134,7 +135,8 @@ function docker_build() {
     INPUT_EXTRA_BUILD_ARGS="$INPUT_EXTRA_BUILD_ARGS --cache-from=$INPUT_CACHE_FROM"
   fi
 
-  docker build $INPUT_EXTRA_BUILD_ARGS -f $INPUT_DOCKERFILE $docker_tag_args $INPUT_PATH
+  cd $INPUT_WORKING_DIRECTORY
+  docker build $INPUT_EXTRA_BUILD_ARGS -f $INPUT_PATH/$INPUT_DOCKERFILE $docker_tag_args .
   echo "== FINISHED DOCKERIZE"
 }
 

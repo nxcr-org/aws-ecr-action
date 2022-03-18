@@ -54,6 +54,10 @@ inputs:
   prebuild_script:
     description: Relative path from top-level to script to run before Docker build
     required: false
+  working_directory:
+    description: The working directory where the docker commands will be executed from
+    required: false
+
 outputs:
   image:
     description: 'The created image name'
