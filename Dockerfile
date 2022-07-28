@@ -1,4 +1,4 @@
-FROM docker:20.10.8
+FROM 180974838604.dkr.ecr.us-west-2.amazonaws.com/docker:20.10.8
 
 RUN apk update \
   && apk upgrade \
