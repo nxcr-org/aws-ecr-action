@@ -5,7 +5,6 @@ INPUT_PATH="${INPUT_PATH:-.}"
 INPUT_DOCKERFILE="${INPUT_DOCKERFILE:-Dockerfile}"
 INPUT_TAGS="${INPUT_TAGS:-latest}"
 INPUT_CREATE_REPO="${INPUT_CREATE_REPO:-false}"
-INPUT_SET_REPO_POLICY="${INPUT_SET_REPO_POLICY:-false}"
 INPUT_REPO_POLICY_FILE="${INPUT_REPO_POLICY_FILE:-repo-policy.json}"
 INPUT_IMAGE_SCANNING_CONFIGURATION="${INPUT_IMAGE_SCANNING_CONFIGURATION:-false}"
 
@@ -24,7 +23,6 @@ function main() {
   run_pre_build_script $INPUT_PREBUILD_SCRIPT
   docker_build $INPUT_TAGS $ACCOUNT_URL
   create_ecr_repo $INPUT_CREATE_REPO
-  set_ecr_repo_policy $INPUT_SET_REPO_POLICY
   put_image_scanning_configuration $INPUT_IMAGE_SCANNING_CONFIGURATION
   docker_push_to_ecr $INPUT_TAGS $ACCOUNT_URL
 }
@@ -73,7 +71,9 @@ function create_ecr_repo() {
     if [ $exit_code -ne 0 ]; then
       if echo ${output} | grep -q RepositoryNotFoundException; then
         echo "== REPO DOESN'T EXIST, CREATING.."
+        pwd
         aws ecr create-repository --region $AWS_DEFAULT_REGION --repository-name $INPUT_REPO
+        aws ecr set-repository-policy --region $AWS_DEFAULT_REGION --repository-name $INPUT_REPO --policy-text '/'${INPUT_REPO_POLICY}''/
         echo "== FINISHED CREATE REPO"
       else
         >&2 echo ${output}
@@ -83,18 +83,6 @@ function create_ecr_repo() {
       echo "== REPO EXISTS, SKIPPING CREATION.."
     fi
     set -e
-  fi
-}
-
-function set_ecr_repo_policy() {
-  if [ "${1}" = true ]; then
-    echo "== START SET REPO POLICY"
-    if [ -f "${INPUT_REPO_POLICY_FILE}" ]; then
-      aws ecr set-repository-policy --repository-name $INPUT_REPO --policy-text file://"${INPUT_REPO_POLICY_FILE}"
-      echo "== FINISHED SET REPO POLICY"
-    else
-      echo "== REPO POLICY FILE (${INPUT_REPO_POLICY_FILE}) DOESN'T EXIST. SKIPPING.."
-    fi
   fi
 }
 
