@@ -38,7 +38,7 @@ inputs:
     default: latest
   image_scanning_configuration:
     description: Set this to True if you want AWS to scan your images for vulnerabilities
-    default: false
+    default: true
   dockerfile:
     description: Name of Dockerfile to use
     default: Dockerfile
