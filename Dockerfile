@@ -1,5 +1,7 @@
 FROM docker:20.10.8
 
+user root
+
 RUN apk update \
   && apk upgrade \
   && apk add --no-cache --update python3 py3-pip coreutils bash \
